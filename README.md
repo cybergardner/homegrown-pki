@@ -16,6 +16,13 @@ A Bash-based Public Key Infrastructure (PKI) managment tool that helps setup and
 - Bash 4.0 or later (5.1.16 or later recommended)
 - Basic understanding of PKI concepts
 
+## File Structure
+```bash
+├── pki-manager.sh        # Main PKI management script
+├── config.env.example    # Template for configuration
+└── openssl.cnf.example   # Template for OpenSSL configuration
+```
+
 ## Installation
 
 1. Clone the repository:
@@ -58,6 +65,27 @@ LEAF_VALIDITY=180          # 6 months
 
 Adjust the validity periods to your own preferences.
 
+## PKI Directory Structure
+
+```
+pki/
+├── root/
+│   ├── private/     # Root CA private key
+│   ├── certs/       # Root CA certificate
+│   ├── newcerts/    # Newly issued certificates
+│   └── crl/         # Certificate revocation lists
+├── intermediate/
+│   ├── private/     # Intermediate CA private key
+│   ├── certs/       # Intermediate CA certificate
+│   ├── csr/         # Certificate signing requests
+│   └── newcerts/    # Newly issued certificates
+└── services/
+    └── <service-name>/
+        ├── private/ # Service private key
+        ├── certs/   # Service certificate
+        └── csr/     # Service CSR
+```
+
 ## Usage
 
 ### Initialize PKI Structure
@@ -86,27 +114,6 @@ Checks when a service's certificate will expire:
 Creates a backup of the PKI directory:
 ```bash
 ./pki-manager.sh backup
-```
-
-## Directory Structure
-
-```
-pki/
-├── root/
-│   ├── private/     # Root CA private key
-│   ├── certs/       # Root CA certificate
-│   ├── newcerts/    # Newly issued certificates
-│   └── crl/         # Certificate revocation lists
-├── intermediate/
-│   ├── private/     # Intermediate CA private key
-│   ├── certs/       # Intermediate CA certificate
-│   ├── csr/         # Certificate signing requests
-│   └── newcerts/    # Newly issued certificates
-└── services/
-    └── <service-name>/
-        ├── private/ # Service private key
-        ├── certs/   # Service certificate
-        └── csr/     # Service CSR
 ```
 
 ## Security Considerations
