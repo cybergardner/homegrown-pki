@@ -1,4 +1,4 @@
-# homegrown-pki
+# pki-manager
 A Bash-based Public Key Infrastructure (PKI) managment tool that helps setup and maintain SSL/TLS certs. This tool uses elliptic curve cryptography for certificates.
 
 ## Features
