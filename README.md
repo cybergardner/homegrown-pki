@@ -41,6 +41,27 @@ cp config.env.example config.env
 chmod +x pki-manager.sh
 ```
 
+## PKI Directory Structure
+
+```
+pki/
+├── root/
+│   ├── private/     # Root CA private key
+│   ├── certs/       # Root CA certificate
+│   ├── newcerts/    # Newly issued certificates
+│   └── crl/         # Certificate revocation lists
+├── intermediate/
+│   ├── private/     # Intermediate CA private key
+│   ├── certs/       # Intermediate CA certificate
+│   ├── csr/         # Certificate signing requests
+│   └── newcerts/    # Newly issued certificates
+└── services/
+    └── <service-name>/
+        ├── private/ # Service private key
+        ├── certs/   # Service certificate
+        └── csr/     # Service CSR
+```
+
 ## Configuration
 
 Edit `config.env` to customize your PKI settings:
@@ -64,27 +85,6 @@ LEAF_VALIDITY=180          # 6 months
 ### Certificate Validity Peroids
 
 Adjust the validity periods to your own preferences.
-
-## PKI Directory Structure
-
-```
-pki/
-├── root/
-│   ├── private/     # Root CA private key
-│   ├── certs/       # Root CA certificate
-│   ├── newcerts/    # Newly issued certificates
-│   └── crl/         # Certificate revocation lists
-├── intermediate/
-│   ├── private/     # Intermediate CA private key
-│   ├── certs/       # Intermediate CA certificate
-│   ├── csr/         # Certificate signing requests
-│   └── newcerts/    # Newly issued certificates
-└── services/
-    └── <service-name>/
-        ├── private/ # Service private key
-        ├── certs/   # Service certificate
-        └── csr/     # Service CSR
-```
 
 ## Usage
 
