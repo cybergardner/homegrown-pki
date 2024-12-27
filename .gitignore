@@ -1,5 +1,6 @@
-# Configuration
+# Configurations
 config.env
+openssl.conf
 
 # PKI directories
 *pki/
