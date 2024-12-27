@@ -20,8 +20,8 @@ A Bash-based Public Key Infrastructure (PKI) managment tool that helps setup and
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/cybergardner/homegrown-pki.git
-cd homegrown-pki
+git clone https://github.com/cybergardner/pki-manager.git
+cd pki-manager
 ```
 
 2. Create your configuration:
