@@ -1,0 +1,11 @@
+# Configuration
+config.env
+
+# PKI directories
+*pki/
+backups/
+
+# System files
+.DS_Store
+*.swp
+*.swo
