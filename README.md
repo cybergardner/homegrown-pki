@@ -20,7 +20,7 @@ A Bash-based Public Key Infrastructure (PKI) managment tool that helps setup and
 ```bash
 ├── pki-manager.sh        # Main PKI management script
 ├── config.env.example    # Template for configuration
-└── openssl.cnf.example   # Template for OpenSSL configuration
+└── openssl.conf.example   # Template for OpenSSL configuration
 ```
 
 ## Installation
