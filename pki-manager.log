@@ -1,0 +1,12 @@
+[2025-01-06 03:00:35] ERROR: Usage: ./pki-manager.sh check <service-name>
+[2025-01-06 03:00:48] ERROR: Usage: ./pki-manager.sh check <service-name>
+[2025-01-06 03:01:52] No services directory found at cybertron-pki/services
+[2025-01-06 03:03:20] No services directory found at cybertron-pki/services
+[2025-01-06 03:10:46] No services directory found at cybertron-pki/services
+[2025-01-06 03:11:06] No services directory found at cybertron-pki/services
+[2025-01-06 03:11:06] Please run  init
+[2025-01-06 03:11:40] No services directory found at cybertron-pki/services
+[2025-01-06 03:11:40] Please run () init
+[2025-01-06 03:12:12] No services directory found at cybertron-pki/services
+[2025-01-06 03:12:12] Please run pki-manager.sh init
+[2025-01-06 03:12:34] No services directory found at cybertron-pki/services

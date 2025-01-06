@@ -45,6 +45,7 @@ chmod +x pki-manager.sh
 
 ```
 pki/
+├── chains/          # Certificate chains
 ├── root/
 │   ├── private/     # Root CA private key
 │   ├── certs/       # Root CA certificate

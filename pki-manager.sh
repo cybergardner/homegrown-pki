@@ -9,7 +9,7 @@
 # - Certificate expiration checking
 # - Automatic backup of critical files
 #
-# Usage: ./pki-manager.sh {init|new-cert|check|backup} [options]
+# Usage: ./pki-manager.sh {init|offline-root|new-cert|check|backup} [options]
 
 set -euo pipefail   # error handling options
 
@@ -358,6 +358,30 @@ generate_leaf_cert() {
     fi
 }
 
+# Function to list all services
+list_services() {
+    local services_dir="${ROOT_DIR}/services"
+    if [[ ! -d "$services_dir" ]]; then
+        echo "No services directory found at ${services_dir}"
+        echo "Please run $(basename "$0") init"
+        return 1
+    fi
+    
+    local services=()
+    while IFS= read -r -d '' dir; do
+        services+=($(basename "$dir"))
+    done < <(find "$services_dir" -mindepth 1 -maxdepth 1 -type d -print0)
+    
+    if [[ ${#services[@]} -eq 0 ]]; then
+        echo "No services found"
+        return 1
+    fi
+    
+    log "Found ${#services[@]} service(s):"
+    for service in "${services[@]}"; do
+        check_expiration "${services_dir}/${service}/certs/${service}.crt" "${service}"
+    done
+}
 # Function to check certificate expiration
 check_expiration() {
     local CERT_PATH=$1
@@ -388,8 +412,9 @@ Usage: $(basename "$0") COMMAND [OPTIONS]
 
 Commands:
     init                                                        Initialize PKI directory structure and create root/intermediate CAs
-    offline-root PATH                                               Creates backup of root CA and deletes private key from disk
+    offline-root PATH                                           Creates backup of root CA and deletes private key from disk
     new-cert SERVICE DOMAIN [CSR-FILE] [ALTERNATE-NAMES...]     Generate a new certificate for a service, optionally from existing CSR
+    check                                                       Prints list of all available services
     check SERVICE                                               Check certificate expiration for a service
     backup                                                      Create a backup of the PKI directory
     help                                                        Show this help message
@@ -408,6 +433,7 @@ Examples:
     $(basename "$0") new-cert nginx example.com /path/to/nginx.csr
     $(basename "$0") new-cert nginx example.com 192.168.1.10 server2.local
     $(basename "$0") new-cert nginx example.com nginx.csr 192.168.1.10 server2.local
+    $(basename "$0") check
     $(basename "$0") check nginx
     $(basename "$0") backup
 
@@ -469,7 +495,8 @@ case "$1" in
         ;;
     "check")
         if [ -z "${2:-}" ]; then
-            error "Usage: $0 check <service-name>"
+            list_services
+            # error "Usage: $0 check <service-name>"
         fi
         check_expiration "${ROOT_DIR}/services/$2/certs/$2.crt" "$2"
         ;;

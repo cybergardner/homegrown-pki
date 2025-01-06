@@ -48,7 +48,7 @@ RANDFILE          = $dir/private/.rand
 private_key       = $dir/private/intermediate.key
 certificate       = $dir/certs/intermediate.crt
 
-default_days      = 365                # 2 years
+default_days      = 365                # 1 years
 default_crl_days  = 30
 default_md        = sha384
 preserve          = no
@@ -58,7 +58,6 @@ unique_subject    = yes
 name_opt         = ca_default
 cert_opt         = ca_default
 copy_extensions   = copy
-
 
 ###############################################################################
 # SECTION: Certificate Policies
