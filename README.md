@@ -173,7 +173,10 @@ Creates a backup of the PKI directory:
 3. **OpenSSL Errors**
    - Verify OpenSSL installation
    - Check OpenSSL version compatibility
-   - Validate openssl.cnf syntax
+   - Validate openssl.conf syntax
+   ```bash
+   openssl req -config openssl.conf -test
+   ```
 
 ## License
 

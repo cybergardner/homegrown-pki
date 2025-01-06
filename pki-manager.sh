@@ -265,6 +265,32 @@ format_san() {
     echo "$san_string"
 }
 
+# Function to create temporary OpenSSL config with SANs
+create_temp_config() {
+    local temp_conf="${ROOT_DIR}/temp_openssl.conf"
+    local san_string="$1"
+    
+    # Copy the main config
+    cp "${OPENSSL_CNF}" "${temp_conf}"
+    
+    # Replace the SAN variable with actual values
+    if [[ -n "${san_string}" ]]; then
+        # Add the SAN section with actual values
+        echo "" >> "${temp_conf}"
+        echo "[ server_san_cert ]" >> "${temp_conf}"
+        echo "basicConstraints = CA:FALSE" >> "${temp_conf}"
+        echo "nsCertType = server" >> "${temp_conf}"
+        echo "nsComment = \"OpenSSL Generated Server Certificate\"" >> "${temp_conf}"
+        echo "subjectKeyIdentifier = hash" >> "${temp_conf}"
+        echo "authorityKeyIdentifier = keyid,issuer:always" >> "${temp_conf}"
+        echo "keyUsage = critical, digitalSignature, keyEncipherment" >> "${temp_conf}"
+        echo "extendedKeyUsage = serverAuth" >> "${temp_conf}"
+        echo "subjectAltName = ${san_string}" >> "${temp_conf}"
+    fi
+    
+    echo "${temp_conf}"
+}
+
 # Function to sign an existing CSR
 sign_csr() {
     local CSR_PATH="$1"
@@ -286,14 +312,20 @@ sign_csr() {
     if [[ ${#ALTERNATE_NAMES[@]} -gt 0 ]]; then
         # Extract CN from CSR to use as primary domain
         primary_domain=$(openssl req -in "${CSR_PATH}" -noout -subject | sed -n 's/.*CN\s*=\s*\([^,]*\).*/\1/p')
-        export SAN=$(format_san "$primary_domain" "${ALTERNATE_NAMES[@]}")
-        log "Adding Subject Alternative Names: ${SAN}"
+        local san_string=$(format_san "$primary_domain" "${ALTERNATE_NAMES[@]}")
+        log "Adding Subject Alternative Names: ${san_string}"
+        
+        # Create temporary config with SANs
+        local temp_conf=$(create_temp_config "${san_string}")
         
         # Sign the CSR with SANs
-        openssl ca -config ${OPENSSL_CNF} -name intermediate_ca -extensions server_alt_names \
+        openssl ca -config "${temp_conf}" -name intermediate_ca -extensions server_san_cert \
             -days ${LEAF_VALIDITY} -notext -md sha384 \
             -in "${CSR_PATH}" \
             -out "${ROOT_DIR}/services/${SERVICE}/certs/${SERVICE}.crt"
+            
+        # Clean up
+        rm -f "${temp_conf}"
     else
         # Sign without SANs
         openssl ca -config ${OPENSSL_CNF} -name intermediate_ca -extensions server_cert \
@@ -302,7 +334,6 @@ sign_csr() {
             -out "${ROOT_DIR}/services/${SERVICE}/certs/${SERVICE}.crt"
     fi
     
-    unset SAN
     log "Certificate generated successfully for ${SERVICE} from provided CSR"
 }
 
@@ -328,12 +359,6 @@ generate_leaf_cert() {
             -out "${ROOT_DIR}/services/${SERVICE}/private/${SERVICE}.key"
         chmod 400 "${ROOT_DIR}/services/${SERVICE}/private/${SERVICE}.key"
         
-        # Format SAN string if alternate names provided
-        if [[ ${#ALTERNATE_NAMES[@]} -gt 0 ]]; then
-            export SAN=$(format_san "$DOMAIN" "${ALTERNATE_NAMES[@]}")
-            log "Adding Subject Alternative Names: ${SAN}"
-        fi
-        
         # Generate CSR
         openssl req -config ${OPENSSL_CNF} -new -sha384 \
             -key "${ROOT_DIR}/services/${SERVICE}/private/${SERVICE}.key" \
@@ -342,10 +367,19 @@ generate_leaf_cert() {
         
         # Sign certificate with appropriate extensions
         if [[ ${#ALTERNATE_NAMES[@]} -gt 0 ]]; then
-            openssl ca -config ${OPENSSL_CNF} -name intermediate_ca -extensions server_alt_names \
+            local san_string=$(format_san "$DOMAIN" "${ALTERNATE_NAMES[@]}")
+            log "Adding Subject Alternative Names: ${san_string}"
+            
+            # Create temporary config with SANs
+            local temp_conf=$(create_temp_config "${san_string}")
+            
+            openssl ca -config "${temp_conf}" -name intermediate_ca -extensions server_san_cert \
                 -days ${LEAF_VALIDITY} -notext -md sha384 \
                 -in "${ROOT_DIR}/services/${SERVICE}/csr/${SERVICE}.csr" \
                 -out "${ROOT_DIR}/services/${SERVICE}/certs/${SERVICE}.crt"
+                
+            # Clean up
+            rm -f "${temp_conf}"
         else
             openssl ca -config ${OPENSSL_CNF} -name intermediate_ca -extensions server_cert \
                 -days ${LEAF_VALIDITY} -notext -md sha384 \
@@ -353,7 +387,6 @@ generate_leaf_cert() {
                 -out "${ROOT_DIR}/services/${SERVICE}/certs/${SERVICE}.crt"
         fi
         
-        unset SAN
         log "Certificate generated successfully for ${SERVICE}"
     fi
 }

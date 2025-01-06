@@ -99,19 +99,23 @@ default_md          = sha384               # Default digest algorithm
 x509_extensions     = v3_ca
 
 [ req_distinguished_name ]
-countryName                     = Country Name (2 letter code)
-stateOrProvinceName             = State or Province Name
-localityName                    = Locality Name
-0.organizationName              = Organization Name
-organizationalUnitName          = Organizational Unit Name
-commonName                      = Common Name
+countryName             = Country Name (2 letter code)
+stateOrProvinceName     = State or Province Name
+localityName            = Locality Name
+organizationName        = Organization Name
+organizationalUnitName  = Organizational Unit Name
+commonName              = Common Name
 
-# Default values for DN fields
 countryName_default             = US
 stateOrProvinceName_default     = State
 localityName_default            = City
-0.organizationName_default      = Home
+organizationName_default        = Home
 organizationalUnitName_default  = Lab
+commonName_default              = Root CA
+
+countryName_min                 = 2
+countryName_max                 = 2
+commonName_max                  = 64
 
 ###############################################################################
 # SECTION: Certificate Extensions
@@ -142,17 +146,6 @@ authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 
-# Leaf certificate extensions for servers with SANs
-[ server_alt_names ]
-basicConstraints = CA:FALSE
-nsCertType = server
-nsComment = "OpenSSL Generated Server Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
-subjectAltName = ${ENV::SAN}
-
 # Leaf certificate extensions for clients
 [ client_cert ]
 basicConstraints = CA:FALSE
@@ -160,7 +153,7 @@ nsCertType = client
 nsComment = "OpenSSL Generated Client Certificate"
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignatureS
+keyUsage = critical, digitalSignature
 extendedKeyUsage = clientAuth
 
 ###############################################################################
