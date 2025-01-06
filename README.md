@@ -38,7 +38,7 @@ cp config.env.example config.env
 
 3. Make the script executable:
 ```bash
-chmod +x pki-manager.sh
+chmod u+x pki-manager.sh
 ```
 
 ## PKI Directory Structure
